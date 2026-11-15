@@ -638,12 +638,13 @@ main:before{inset:6px;border:1px solid #ca9a56a8;border-radius:8px}
 <button class="word-tool" disabled="" id="richBrushUndo" type="button">Undo stroke</button>
 </div><div class="word-ribbon-caption">Drag across letters to paint</div></div></div></div>
 <div aria-label="Crafting description" class="word-document-tabs" role="tablist">
+<button aria-selected="false" aria-controls="keywordsPanel" class="word-doc-tab" data-open-desc="keywords" id="keywordsTab" role="tab" type="button">Keywords <small>keywords</small></button>
 <button aria-selected="true" class="word-doc-tab active" data-open-desc="shortdesc" role="tab" type="button">Item name <small>shortdesc</small></button>
 <button aria-selected="false" class="word-doc-tab" data-open-desc="roomdesc" role="tab" type="button">On the ground <small>roomdesc</small></button>
 <button aria-selected="false" class="word-doc-tab" data-open-desc="extradesc" role="tab" type="button">Examine <small>extradesc</small></button>
 </div>
 <div class="word-paper-desk">
-<div class="studio-keywords-card">
+<div aria-labelledby="keywordsTab" class="studio-keywords-card" hidden id="keywordsPanel" role="tabpanel">
   <div class="rich-editor-head"><label for="keywords">Item keywords</label><span class="commandtag">craft keywords</span></div>
   <p class="studio-keywords-intro">These are the words players use to target the crafted item in MUD commands. Edit them independently of the three colored descriptions.</p>
   <input id="keywords" type="text" maxlength="100" spellcheck="false" autocomplete="off" placeholder="Choose a material to generate sample keywords" aria-describedby="keywordRule keywordFeedback"/>
@@ -1135,14 +1136,21 @@ function restoreWordHistory(direction){
 }
 function showWordRibbon(){/* All editing controls share one toolbar. */}
 function showWordDocument(field){
- if(!fields.includes(field))return;
+ if(field!=='keywords'&&!fields.includes(field))return;
  if(field!==currentWordDocument){savedRichSelection=null;const selection=window.getSelection();if(selection?.rangeCount&&editorContaining(selection.anchorNode))selection.removeAllRanges()}
- currentWordDocument=field;activeRichField=field;
+ const keywords=field==='keywords';
+ if(keywords){setBrushMode(false);setWordEyedropper(false)}
+ currentWordDocument=field;if(!keywords)activeRichField=field;
+ $('keywordsPanel').hidden=!keywords;
+ $('editorToolTabs').hidden=keywords;$('ribbonHome').hidden=keywords;
  for(const card of document.querySelectorAll('#ansiEditor .rich-editor-card'))card.hidden=card.querySelector('.rich-edit')?.dataset.field!==field;
  document.querySelectorAll('#ansiEditor [data-open-desc]').forEach(b=>{const active=b.dataset.openDesc===field;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active))});
+ $('richContext').textContent=keywords?'Edit plain-text targeting keywords. Include the primary material and item variant.':'Select text in a description, then apply a color or a gradient.';
  updateWordHistoryButtons();updateWordStatus();
 }
-function updateWordStatus(){const f=currentWordDocument,ed=$(f+'Rich');if(!ed)return;
+function updateWordStatus(){const f=currentWordDocument;
+ if(f==='keywords'){$('richDocumentStats').textContent='Keywords · '+$('keywords').value.length+' / 100 characters';$('richSelectionStats').textContent='Plain text only · no hyphens';return}
+ const ed=$(f+'Rich');if(!ed)return;
  const total=readRichTokens(ed).length,sel=richRangeSnapshot()||savedRichSelection;const selected=sel&&sel.field===f?Math.max(0,sel.end-sel.start):0;
  $('richDocumentStats').textContent=({shortdesc:'Item name',roomdesc:'On the ground',extradesc:'Examine'}[f])+' · '+total+' visible characters · 80-column color refresh';
  $('richSelectionStats').textContent=selected?selected+' characters selected':'Select text to format or paint';
@@ -1177,6 +1185,7 @@ function startWordToolbar(){
  
  
  document.querySelectorAll('[data-open-desc]').forEach(b=>b.addEventListener('click',()=>showWordDocument(b.dataset.openDesc)));
+ $('keywords').addEventListener('input',updateWordStatus);
  $('richUndo').addEventListener('click',()=>restoreWordHistory(-1));$('richRedo').addEventListener('click',()=>restoreWordHistory(1));
  $('richSelectAll').addEventListener('pointerdown',e=>e.preventDefault());
  $('richSelectAll').addEventListener('click',()=>{setBrushMode(false);const ed=$(currentWordDocument+'Rich');ed.focus();restoreRichRange(ed,0,readRichTokens(ed).length);updateWordStatus()});
