@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Krynn Color Text Editor</title>
+<style>
+:root{color-scheme:light;--navy:#07131e;--navy2:#112332;--gold:#bb8843;--gold2:#e3bf80;--ink:#543422;--muted:#7d6046;--paper:#f3ddbb;--paper2:#f8e9ce;--edge:#cfa66b;--line:#d4b68a;--terminal:#0b141b;--terminal-line:#344956;--button:#563623;--button-hi:#70452b}
+*{box-sizing:border-box}[hidden]{display:none!important}html{min-height:100%}body{margin:0;min-height:100vh;background:var(--navy);color:var(--ink);font-family:Georgia,'Times New Roman',serif}button,select,input,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[contenteditable]:focus-visible{outline:2px solid #bd8d35;outline-offset:2px}
+.site{max-width:1420px;margin:26px auto;min-height:calc(100vh - 52px);padding:18px 27px 38px;border:2px solid var(--edge);border-radius:15px;background:radial-gradient(ellipse at 50% 5%,#f9e9cb 0,#f2d6a9 58%,#e8c99c 100%);box-shadow:0 0 0 5px #09212b,0 22px 100px #0009}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #b88c55;padding:9px 2px 17px;flex-wrap:wrap}.titlemark{color:#ad773b;font:700 11px/1.3 system-ui, sans-serif;letter-spacing:.20em;text-transform:uppercase}.top h1{font-size:clamp(23px,3vw,34px);font-weight:600;margin:6px 0 0;letter-spacing:.015em}.top-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid #9b703b;background:var(--button);color:#ffe6b8;border-radius:5px;padding:9px 12px;font:600 12px/1.25 system-ui,sans-serif;min-height:36px;transition:background .1s}.btn:hover{background:var(--button-hi)}.btn.light{background:#f7e8cc;color:#65432a}.btn.light:hover{background:#ffefd4}.btn.selected{background:#173140;color:#f4d7a6;border-color:#7994a0}.btn.mini{padding:6px 9px;min-height:31px}.btn.sq{min-width:34px;padding:6px}.muted{color:var(--muted)}
+.tabs{display:flex;gap:7px;align-items:end;margin-top:18px;border-bottom:2px solid #b58a51}.tab{appearance:none;background:#e6c99e;color:#66432a;border:1px solid #bc925e;border-bottom:0;padding:11px 19px;border-radius:7px 7px 0 0;font:700 14px system-ui,sans-serif}.tab[aria-selected=true]{background:#563823;color:#ffe7b8;position:relative;bottom:-2px;padding-bottom:13px}.tabpage{display:none;padding-top:16px}.tabpage.active{display:block}
+.ribbon{border:1px solid #c6a16c;background:#f7e9d1;border-radius:7px;padding:13px;box-shadow:0 2px 12px #7c492a17}.ribbon-top{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}.group{padding:6px 15px;border-right:1px solid #dcc39d;display:flex;flex-direction:column;gap:9px;min-width:175px}.group:first-child{padding-left:4px}.group:last-child{border-right:0}.group-title{font:700 10px system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#8a6036}.controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.control-caption{font:600 11px system-ui,sans-serif;color:#715338}.swatch-action{display:inline-flex;align-items:center;gap:7px;padding:5px 8px;height:35px;border:1px solid #bc9664;background:#fff5e3;color:#67452a;border-radius:5px;font:600 12px system-ui,sans-serif}.swatch-action:hover,.swatch-action:focus{background:white}.chip{width:21px;height:21px;background:#c55;border:1px solid #77624c;display:inline-block;border-radius:3px;flex:none}.chip.clear{background:linear-gradient(135deg,#fefefe 0 47%,#c44 48% 53%,#fff 54%)}
+select{background:#fff8e9;color:#543722;border:1px solid #b9996e;border-radius:4px;padding:7px 8px;min-height:35px;font:600 12px system-ui,sans-serif;max-width:190px}.check{display:inline-flex;gap:5px;align-items:center;font:12px system-ui,sans-serif;white-space:nowrap;color:#674730}.check input{accent-color:#66402d}.text-button{border:0;background:none;color:#704327;font:600 12px system-ui,sans-serif;text-decoration:underline;cursor:pointer;padding:4px}
+.palette{margin-top:12px;border-top:1px solid #d3b386;padding-top:14px}.palette[hidden],.hidden{display:none!important}.palette-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}.palette-head strong{font:700 14px Georgia,serif}.palette-note{font:11px/1.5 system-ui,sans-serif;color:#86613d}.palette-area{max-height:228px;overflow:auto;padding:8px;background:#e6cda9;border-radius:6px;border:1px solid #c39b63}.palette-section{font:700 10px system-ui,sans-serif;letter-spacing:.10em;color:#60432c;text-transform:uppercase;margin:10px 0 5px}.palette-section:first-child{margin-top:0}.palette-grid{display:grid;grid-template-columns:repeat(24,minmax(18px,1fr));gap:4px}.palchip{height:24px;min-width:0;padding:0;border:1px solid #615d5870;border-radius:3px;position:relative}.palchip:hover,.palchip:focus-visible{outline:2px solid #2a271d;outline-offset:1px;z-index:2}.palchip.chosen:after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;color:white;text-shadow:0 1px 2px black,0 0 3px black;font:700 16px sans-serif}.palette-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:9px;flex-wrap:wrap}.palette-foot input[type=color]{width:34px;height:30px;padding:2px;border:1px solid #bb9055;background:#fff0d4;border-radius:5px}.recent{display:flex;gap:5px;align-items:center;flex-wrap:wrap}.recent .palchip{width:23px}
+.workarea{margin-top:17px;background:#ead0aa;border:1px solid #c49b62;border-radius:7px;padding:14px 16px 17px}.worktop{display:flex;justify-content:space-between;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px}.worktop strong{font:700 14px Georgia,serif}.counter{font:600 11px system-ui,sans-serif;color:#715136}.editor-scroller{background:var(--terminal);border:1px solid var(--terminal-line);border-radius:5px;padding:18px;overflow:auto;min-height:310px;max-height:65vh;cursor:text;box-shadow:inset 0 1px 15px #0008}.page-width{font:16px/1.65 'Consolas','Cascadia Mono','DejaVu Sans Mono',monospace;width:min(100%,80ch);margin:0 auto}.editor{font:inherit;letter-spacing:0;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;width:100%;min-height:275px;min-width:0;color:#e8e9e6;caret-color:#ffde9d;outline:none}.editor:empty:before{content:'Type your description here…';color:#80949d;pointer-events:none}.editor::selection,.editor *::selection{background:#90724f;color:#fff}.editor.paint-on{cursor:crosshair;user-select:none}.editor.paint-on *{cursor:crosshair}.ruler{font:10px 'Consolas',monospace;color:#9cafb8;display:flex;justify-content:space-between;width:100%;padding:0 0 7px;margin:0 auto}.workfoot{font:11px/1.5 system-ui,sans-serif;color:#805d3b;display:flex;justify-content:space-between;gap:9px;flex-wrap:wrap;margin-top:9px}
+.codearea{width:100%;min-height:410px;resize:vertical;background:#0c171d;color:#e7e5cd;font:13px/1.65 Consolas,'DejaVu Sans Mono',monospace;border:1px solid #5b6665;padding:18px;border-radius:6px;tab-size:4}.codeheader{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 11px}.codeheader .controls{gap:8px}.info{font:12px/1.6 system-ui,sans-serif;color:#765b40}.status{min-height:20px;font:12px system-ui,sans-serif;color:#5e522f;margin:13px 3px 0}.legend{border-top:1px solid #c7a16f;margin-top:18px;padding-top:12px;text-align:center;font:11px/1.5 system-ui,sans-serif;color:#805f40}
+@media(max-width:1050px){.site{margin:14px 18px;padding:15px 20px}.group{min-width:150px;flex:1;border-bottom:1px solid #dcc39d}.group:last-child{border-bottom:0}.page-width{font-size:14px}.palette-grid{grid-template-columns:repeat(18,minmax(16px,1fr))}}
+@media(max-width:620px){.site{margin:5px;border-radius:7px;padding:12px 12px 24px;min-height:calc(100vh - 10px)}.top h1{font-size:25px}.top-actions{width:100%}.top-actions .btn{flex:1}.tabs .tab{flex:1;text-align:center;font-size:12px;padding:10px 7px}.tab[aria-selected=true]{padding-bottom:12px}.group{min-width:calc(50% - 4px);padding:8px 7px}.group:first-child{padding-left:7px}.group:nth-child(even){border-right:0}.ribbon{padding:7px}.swatch-action{font-size:11px}.editor-scroller{padding:10px;min-height:270px}.page-width{font-size:12px}.editor{min-height:250px}.workarea{padding:10px}.palette-grid{grid-template-columns:repeat(12,minmax(15px,1fr));gap:3px}.palchip{height:22px}}
+</style>
+</head>
+<body>
+<main class="site">
+  <header class="top">
+    <div><div class="titlemark">Chronicles of Krynn</div><h1>Krynn Color Text Editor</h1></div>
+    <div class="top-actions">
+      <button class="btn light" id="openFile" type="button">Open file</button>
+      <button class="btn light" id="saveProject" type="button">Save project</button>
+      <button class="btn" id="copyCodeTop" type="button">Copy MUD codes</button>
+      <input type="file" id="fileInput" hidden accept=".json,.txt,.ans,text/plain,application/json">
+    </div>
+  </header>
+  <nav class="tabs" aria-label="Editor tabs">
+    <button class="tab" data-tab="edit" role="tab" aria-selected="true" type="button">Editor View</button>
+    <button class="tab" data-tab="code" role="tab" aria-selected="false" type="button">Code View</button>
+  </nav>
+  <section id="editTab" class="tabpage active" role="tabpanel">
+    <div class="ribbon">
+      <div class="ribbon-top">
+        <div class="group"><div class="group-title">Edit</div><div class="controls">
+          <button class="btn light mini" id="undo" title="Undo (Ctrl+Z)" type="button">↶ Undo</button>
+          <button class="btn light mini" id="redo" title="Redo (Ctrl+Y)" type="button">↷ Redo</button>
+          <button class="btn light mini" id="selectAll" type="button">Select all</button>
+          <button class="btn light mini" id="clearStyle" type="button">Clear color</button>
+        </div></div>
+        <div class="group"><div class="group-title">Font &amp; highlight colors</div><div class="controls">
+          <button class="swatch-action" data-color-target="fg" type="button"><span class="chip" id="fgChip"></span>Text color ▾</button>
+          <button class="swatch-action" data-color-target="bg" type="button"><span class="chip" id="bgChip"></span>Highlight ▾</button>
+          <button class="btn light mini" id="eyedropper" title="Click a character to sample its color" type="button">⌖ Pick</button>
+        </div></div>
+        <div class="group"><div class="group-title">Gradient</div><div class="controls">
+          <select id="stops" aria-label="Gradient number of colors"><option value="2">2 colors</option><option value="3">3 colors</option></select>
+          <button class="swatch-action" data-color-target="start" type="button" title="Gradient start"><span class="chip" id="startChip"></span>Start</button>
+          <button class="swatch-action" data-color-target="middle" id="middleButton" type="button" title="Gradient middle" hidden><span class="chip" id="middleChip"></span>Middle</button>
+          <button class="swatch-action" data-color-target="end" type="button" title="Gradient end"><span class="chip" id="endChip"></span>End</button>
+        </div><div class="controls">
+          <select id="blend" aria-label="Gradient blending"><option value="letters">By character</option><option value="words">By word</option></select>
+          <select id="gradTarget" aria-label="Gradient affects"><option value="fg">Text color</option><option value="bg">Highlight</option></select>
+          <button class="btn mini" id="applyGradient" type="button">Apply to selection</button>
+          <button class="btn light mini" id="gradAll" type="button">Whole text</button>
+        </div></div>
+        <div class="group"><div class="group-title">Paint</div><div class="controls">
+          <select id="brushType" aria-label="Brush type">
+            <option value="gradient">Gradient brush</option>
+            <option value="solid">Solid text brush</option>
+            <option value="highlight">Highlight brush</option>
+            <option value="erase">Erase colors</option>
+          </select>
+          <button class="btn light mini" id="paintToggle" type="button" aria-pressed="false">🖌 Paint off</button>
+        </div><div class="controls"><span class="control-caption">Select text or drag across the editor to paint.</span></div></div>
+      </div>
+      <section class="palette" id="paletteTray" hidden aria-label="256-color palette">
+        <div class="palette-head"><div><strong id="paletteTitle">Select color</strong><div class="palette-note" id="paletteDescription">All 256 ANSI swatches. Krynn codes use the nearest 216-color RGB value.</div></div><button class="btn light mini" id="closePalette" type="button">Close ✕</button></div>
+        <div class="palette-area">
+          <div class="palette-section">Standard ANSI · 16 colors</div><div class="palette-grid" id="standardGrid"></div>
+          <div class="palette-section">RGB color cube · 216 colors</div><div class="palette-grid" id="rgbGrid"></div>
+          <div class="palette-section">Grayscale · 24 shades</div><div class="palette-grid" id="grayGrid"></div>
+        </div>
+        <div class="palette-foot">
+          <div class="recent"><span class="control-caption">Recent:</span><span id="recentColors" class="recent"></span></div>
+          <div class="controls"><label class="control-caption" for="customColor">Custom:</label><input type="color" id="customColor" value="#e5c17c"><button class="btn light mini" id="noColor" type="button">No color</button></div>
+        </div>
+      </section>
+    </div>
+    <section class="workarea" aria-label="80-column text editor">
+      <div class="worktop"><strong>Description</strong><span class="counter" id="counter">0 characters · 1 line · 80-column wrap</span></div>
+      <div class="editor-scroller" id="editorScroller"><div class="page-width"><div class="ruler"><span>1</span><span>20</span><span>40</span><span>60</span><span>80</span></div><div id="editor" class="editor" contenteditable="true" role="textbox" aria-label="Description text" aria-multiline="true" spellcheck="false"></div></div></div>
+      <div class="workfoot"><span>80 visible columns • color codes do not count toward the width</span><span id="selectionInfo">Select text to apply colors</span></div>
+    </section>
+  </section>
+  <section id="codeTab" class="tabpage" role="tabpanel">
+    <div class="codeheader"><div><strong>Editable MUD color codes</strong><div class="info">Changes here update Editor View. Color syntax: <code>@[F500]</code>, <code>@[B055]</code>, <code>@n</code>.</div></div><div class="controls"><button class="btn" id="copyCode" type="button">Copy codes</button><button class="btn light" id="saveCode" type="button">Save .txt</button></div></div>
+    <textarea id="codeArea" class="codearea" spellcheck="false" aria-label="Editable Krynn ANSI markup"></textarea>
+    <p class="info">Codes for active colors are refreshed after each 80 visible characters without adding a newline. Line breaks you enter manually remain line breaks.</p>
+  </section>
+  <div class="status" role="status" id="status"></div>
+  <footer class="legend">Portable offline editor • 256-color palette • Krynn @-style color markup</footer>
+</main>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const editor = $('editor'), code = $('codeArea');
+const standard = ['#000000','#800000','#008000','#808000','#000080','#800080','#008080','#c0c0c0','#808080','#ff0000','#00ff00','#ffff00','#0000ff','#ff00ff','#00ffff','#ffffff'];
+const cube = [0,95,135,175,215,255];
+const rgb = (n)=>{
+  if(n<16){const s=standard[n].slice(1);return [0,2,4].map(i=>parseInt(s.slice(i,i+2),16));}
+  if(n<232){let k=n-16;return [cube[Math.floor(k/36)],cube[Math.floor(k/6)%6],cube[k%6]];}
+  const v=8+10*(n-232);return [v,v,v];
+};
+const hex = n=>'#'+rgb(n).map(v=>v.toString(16).padStart(2,'0')).join('');
+const nearestCube = n => {const a=rgb(n); const steps=a.map(v=>cube.reduce((bi,x,i)=>Math.abs(x-v)<Math.abs(cube[bi]-v)?i:bi,0));return 16+36*steps[0]+6*steps[1]+steps[2];};
+const toKrynn = (n,side) => {const k=nearestCube(n)-16;return `@[${side}${Math.floor(k/36)}${Math.floor(k/6)%6}${k%6}]`;};
+const fromKrynn = digits => 16+(+digits[0])*36+(+digits[1])*6+(+digits[2]);
+const nearest = color => {const v = color.replace('#',''); const arr = [0,2,4].map(i=>parseInt(v.slice(i,i+2),16));let best=16,dist=Infinity;for(let i=0;i<256;i++){const c=rgb(i),d=c.reduce((sum,x,j)=>sum+(x-arr[j])**2,0);if(d<dist){dist=d;best=i;}}return best;};
+const createChar = (ch,fg=null,bg=null)=>({ch,fg,bg});
+let chars=[], past=[], future=[], typing={fg:null,bg:null}, recent=[], paletteTarget=null, tab='edit', savedSelection={start:0,end:0}, painting=null, brushOn=false, pickerOn=false, composing=false, suppressInput=false;
+const settings={stopCount:2,start:196,middle:220,end:21,blend:'letters',gradTarget:'fg'};
+const status = text=>{ $('status').textContent=text; };
+const clone = a=>a.map(c=>({...c}));
+const snapshot =()=>({chars:clone(chars),typing:{...typing}});
+const putHistory =()=>{past.push(snapshot());if(past.length>150)past.shift();future.length=0;};
+const plain =()=>chars.map(c=>c.ch).join('');
+function rawCode(){
+ let out='',sf=null,sb=null,col=0,refresh=false;
+ for(const c of chars){
+   if(c.ch==='\n'){out+='\n';col=0;refresh=true;continue;}
+   if(col===80){col=0;refresh=true;}
+   if((sf!==null&&c.fg===null)||(sb!==null&&c.bg===null)){out+='@n';sf=null;sb=null;}
+   if(c.fg!==null&&(sf!==c.fg||refresh)){out+=toKrynn(c.fg,'F');sf=c.fg;}
+   if(c.bg!==null&&(sb!==c.bg||refresh)){out+=toKrynn(c.bg,'B');sb=c.bg;}
+   out+=c.ch;col++;refresh=false;
+ }
+ if(sf!==null||sb!==null)out+='@n';
+ return out;
+}
+function parseCode(src){
+ const a=[];let fg=null,bg=null;
+ for(let i=0;i<src.length;){
+   if(src[i]==='@'){
+     const match=/^@\[([FB])([0-5]{3})\]/i.exec(src.slice(i));
+     if(match){const val=fromKrynn(match[2]);if(match[1].toUpperCase()==='F')fg=val;else bg=val;i+=match[0].length;continue;}
+     if(src[i+1]==='n'||src[i+1]==='N'){fg=null;bg=null;i+=2;continue;}
+   }
+   const c=String.fromCodePoint(src.codePointAt(i));i+=c.length;a.push(createChar(c,fg,bg));
+ }
+ return a;
+}
+function saveSelection(){
+ if(tab!=='edit')return;
+ const s=window.getSelection();if(!s||!s.rangeCount||!editor.contains(s.anchorNode)||!editor.contains(s.focusNode))return;
+ const r=s.getRangeAt(0);savedSelection={start:offsetOf(r.startContainer,r.startOffset),end:offsetOf(r.endContainer,r.endOffset)};
+ $('selectionInfo').textContent=savedSelection.end>savedSelection.start?`${savedSelection.end-savedSelection.start} characters selected`:'Select text to apply colors';
+}
+function offsetOf(node,offset){
+ try{const r=document.createRange();r.selectNodeContents(editor);r.setEnd(node,offset);return Array.from(r.toString()).length;}catch(e){return savedSelection.start;}
+}
+function setSelection(start,end=start){
+ const s=window.getSelection();if(!s)return;
+ const walker=document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);let nodes=[],n;while(n=walker.nextNode())nodes.push(n);
+ const pos=i=>{i=Math.max(0,Math.min(chars.length,i));for(const node of nodes){const cp=Array.from(node.textContent||'');if(i<=cp.length){return [node,cp.slice(0,i).join('').length];}i-=cp.length;}return nodes.length?[nodes[nodes.length-1],nodes[nodes.length-1].textContent.length]:[editor,0];};
+ const a=pos(start),b=pos(end),r=document.createRange();try{r.setStart(...a);r.setEnd(...b);s.removeAllRanges();s.addRange(r);}catch(e){}
+ savedSelection={start,end};$('selectionInfo').textContent=end>start?`${end-start} characters selected`:'Select text to apply colors';
+}
+function render(caret=null){
+ const f=document.createDocumentFragment();let run='',rf=null,rb=null;
+ function flush(){if(!run)return;const span=document.createElement('span');span.textContent=run;if(rf!==null)span.style.color=hex(rf);if(rb!==null)span.style.backgroundColor=hex(rb);f.append(span);run='';}
+ for(const c of chars){if(run&& (rf!==c.fg||rb!==c.bg))flush();rf=c.fg;rb=c.bg;run+=c.ch;}
+ flush();suppressInput=true;editor.replaceChildren(f);suppressInput=false;
+ if(caret)setSelection(caret.start,caret.end);
+ let lines=0;for(const line of plain().split('\n'))lines+=Math.max(1,Math.ceil(Array.from(line).length/80));
+ $('counter').textContent=`${chars.length.toLocaleString()} characters · ${lines} visual ${lines===1?'line':'lines'} · 80-column wrap`;
+ updateChips();
+}
+function updateChips(){
+ const set=(id,n)=>{const el=$(id);el.style.background=n===null?'linear-gradient(135deg,#fff 0 47%,#ae423e 48% 53%,#fff 54%)':hex(n);};
+ set('fgChip',typing.fg);set('bgChip',typing.bg);set('startChip',settings.start);set('middleChip',settings.middle);set('endChip',settings.end);
+ const chosen=paletteTarget==='start'?settings.start:paletteTarget==='middle'?settings.middle:paletteTarget==='end'?settings.end:typing[paletteTarget]??null;
+ document.querySelectorAll('.palchip[data-index]').forEach(el=>el.classList.toggle('chosen',+el.dataset.index===chosen));
+}
+function commitReplacement(from,to,value){
+ if(from>to)[from,to]=[to,from];putHistory();const prior=chars[Math.max(0,from-1)]||null;const fg=typing.fg!==null?typing.fg:(prior?.fg??null), bg=typing.bg!==null?typing.bg:(prior?.bg??null);
+ const fresh=Array.from(value.replace(/\r\n?/g,'\n')).map(ch=>createChar(ch,fg,bg));chars.splice(from,to-from,...fresh);render({start:from+fresh.length,end:from+fresh.length});
+}
+function selection(){return {...savedSelection};}
+function withRange(fn,emptyMode='typing'){
+ const {start,end}=selection(); if(end<=start){if(emptyMode==='all'){fn(0,chars.length);}else status('Select some text first, or choose Whole text.');return;}
+ fn(start,end);
+}
+function formatRange(a,b,key,val){if(a>=b)return;putHistory();for(let i=a;i<b;i++)if(chars[i]?.ch!=='\n')chars[i][key]=val;render({start:a,end:b});}
+function clearRange(a,b){if(a>=b)return;putHistory();for(let i=a;i<b;i++){chars[i].fg=null;chars[i].bg=null;}render({start:a,end:b});}
+function gradientColor(t){
+ const stops=settings.stopCount===3?[settings.start,settings.middle,settings.end]:[settings.start,settings.end];
+ const cols=stops.map(rgb);let a,b,q;
+ if(stops.length===3){if(t<=.5){a=cols[0];b=cols[1];q=t*2;}else{a=cols[1];b=cols[2];q=(t-.5)*2;}}
+ else{a=cols[0];b=cols[1];q=t;}
+ return nearest('#'+a.map((v,i)=>Math.round(v+(b[i]-v)*q).toString(16).padStart(2,'0')).join(''));
+}
+function gradientAt(a,b){
+ const indices=[];for(let i=a;i<b;i++)if(chars[i]&&chars[i].ch!=='\n')indices.push(i);
+ if(!indices.length)return [];
+ const chosen=new Map();let targets=[];
+ if(settings.blend==='words'){
+   let groups=[],current=[];
+   for(const i of indices){if(/\s/.test(chars[i].ch)){if(current.length){groups.push(current);current=[];}}else current.push(i);}
+   if(current.length)groups.push(current);
+   if(groups.length>=settings.stopCount){targets=groups;}else{targets=indices.filter(i=>! /\s/.test(chars[i].ch)).map(i=>[i]);}
+ }else targets=indices.filter(i=>! /\s/.test(chars[i].ch)).map(i=>[i]);
+ if(targets.length===0)return [];
+ targets.forEach((group,j)=>{const t=targets.length===1?0:j/(targets.length-1),col=gradientColor(t);group.forEach(i=>chosen.set(i,col));});
+ let last=null;for(const i of indices){if(chosen.has(i))last=chosen.get(i);else if(last!==null)chosen.set(i,last);}
+ return Array.from(chosen.entries());
+}
+function applyGradient(a,b){if(a>=b)return;const cells=gradientAt(a,b);if(!cells.length)return;putHistory();for(const [i,n] of cells)chars[i][settings.gradTarget]=n;render({start:a,end:b});status(`Applied ${settings.stopCount}-color gradient.`);}
+function undo(){if(!past.length)return;future.push(snapshot());const old=past.pop();chars=clone(old.chars);typing={...old.typing};render({start:Math.min(savedSelection.start,chars.length),end:Math.min(savedSelection.start,chars.length)});status('Undone.');}
+function redo(){if(!future.length)return;past.push(snapshot());const old=future.pop();chars=clone(old.chars);typing={...old.typing};render({start:Math.min(savedSelection.start,chars.length),end:Math.min(savedSelection.start,chars.length)});status('Redone.');}
+function copyText(text){
+ if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(text).then(()=>status('Copied to clipboard.')).catch(()=>copyFallback(text));
+ return copyFallback(text);
+}
+function copyFallback(t){const area=document.createElement('textarea');area.value=t;area.style.position='fixed';area.style.opacity='0';document.body.append(area);area.select();try{document.execCommand('copy');status('Copied to clipboard.');}catch(e){status('Clipboard blocked. Use Code View and copy manually.');}area.remove();}
+function download(name,text,mime='text/plain'){const blob=new Blob([text],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);}
+function openPalette(target){
+ paletteTarget=target;const names={fg:'Text color',bg:'Highlight color',start:'Gradient start',middle:'Gradient middle',end:'Gradient end'};
+ $('paletteTitle').textContent=names[target]+' · ANSI 256 palette';$('paletteTray').hidden=false;updateChips();
+}
+function addRecent(n){if(n===null)return;recent=[n,...recent.filter(x=>x!==n)].slice(0,10);$('recentColors').replaceChildren(...recent.map(x=>{const b=document.createElement('button');b.type='button';b.className='palchip';b.style.background=hex(x);b.title=`ANSI ${x}`;b.addEventListener('click',()=>chooseColor(x));return b;}));}
+function chooseColor(n){
+ if(!paletteTarget)return;
+ const key=paletteTarget;
+ if(key==='fg'||key==='bg'){
+   const {start,end}=selection();if(start<end)formatRange(start,end,key,n);else{typing[key]=n;updateChips();status(`${key==='fg'?'Text':'Highlight'} typing color ${n===null?'cleared':'set'}.`);}
+ }else if(n!==null){settings[key]=n;updateChips();status(`Gradient ${key} color selected.`);}
+ addRecent(n);updateChips();
+}
+function buildPalette(){for(let n=0;n<256;n++){const b=document.createElement('button');b.type='button';b.className='palchip';b.dataset.index=n;b.style.background=hex(n);const code=toKrynn(n,'F');b.title=`ANSI ${n} · ${hex(n)} · ${code}`;b.setAttribute('aria-label',`Color ${n}, ${hex(n)}, Krynn ${code}`);b.addEventListener('click',()=>chooseColor(n));$(n<16?'standardGrid':n<232?'rgbGrid':'grayGrid').append(b);}}
+function switchTab(which){if(which===tab)return;if(which==='code')code.value=rawCode();else render();tab=which;$('editTab').classList.toggle('active',which==='edit');$('codeTab').classList.toggle('active',which==='code');document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===which)));$('paletteTray').hidden=true;pickerOn=false;status('');}
+function syncFromDom(){
+ const text=editor.innerText.replace(/\r\n?/g,'\n');if(text===plain())return;
+ putHistory();const old=chars;const nu=Array.from(text);chars=nu.map((ch,i)=>createChar(ch,old[Math.min(i,old.length-1)]?.fg??null,old[Math.min(i,old.length-1)]?.bg??null));render();status('Text updated.');
+}
+function insert(value){const s=selection();commitReplacement(s.start,s.end,value);}
+editor.addEventListener('beforeinput',e=>{
+ if(composing||e.isComposing)return;
+ saveSelection();
+ const type=e.inputType||'';if(type==='insertText'||type==='insertReplacementText'){e.preventDefault();insert(e.data||'');return;}
+ if(type==='insertParagraph'||type==='insertLineBreak'){e.preventDefault();insert('\n');return;}
+ if(type==='deleteContentBackward'||type==='deleteContentForward'||type==='deleteWordBackward'||type==='deleteWordForward'||type==='deleteByCut'){
+   e.preventDefault();let {start,end}=selection();if(start===end){if(type==='deleteWordBackward'){let t=plain();let cp=Array.from(t);while(start>0&&/\s/.test(cp[start-1]))start--;while(start>0&&!/\s/.test(cp[start-1]))start--;}else if(type==='deleteWordForward'){let cp=Array.from(plain());while(end<cp.length&&!/\s/.test(cp[end]))end++;while(end<cp.length&&/\s/.test(cp[end]))end++;}else if(type==='deleteContentBackward')start=Math.max(0,start-1);else end=Math.min(chars.length,end+1);}
+   commitReplacement(start,end,'');return;
+ }
+ if(type==='historyUndo'){e.preventDefault();undo();return;}
+ if(type==='historyRedo'){e.preventDefault();redo();return;}
+});
+editor.addEventListener('input',()=>{if(!suppressInput&&!composing)syncFromDom();});
+editor.addEventListener('compositionstart',()=>{composing=true;});
+editor.addEventListener('compositionend',()=>{composing=false;syncFromDom();});
+editor.addEventListener('paste',e=>{saveSelection();e.preventDefault();insert((e.clipboardData?.getData('text/plain')||'').replace(/\r\n?/g,'\n'));});
+editor.addEventListener('keydown',e=>{
+ saveSelection();
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();if(e.shiftKey)redo();else undo();}
+ else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();}
+ else if(e.key==='Tab'){e.preventDefault();insert('    ');}
+});
+editor.addEventListener('copy',e=>{if(!e.clipboardData)return;const {start,end}=selection();e.preventDefault();e.clipboardData.setData('text/plain',chars.slice(start,end).map(c=>c.ch).join(''));});
+document.addEventListener('selectionchange',saveSelection);
+editor.addEventListener('pointerup',saveSelection);
+editor.addEventListener('keyup',saveSelection);
+editor.addEventListener('focus',saveSelection);
+function atPoint(x,y){let r=null;if(document.caretRangeFromPoint)r=document.caretRangeFromPoint(x,y);else if(document.caretPositionFromPoint){const c=document.caretPositionFromPoint(x,y);if(c){r=document.createRange();r.setStart(c.offsetNode,c.offset);}}
+ if(!r||!editor.contains(r.startContainer))return null;return Math.max(0,Math.min(chars.length,offsetOf(r.startContainer,r.startOffset)));}
+editor.addEventListener('pointerdown',e=>{
+ if(e.button!==0||(!brushOn&&!pickerOn))return;
+ const pos=atPoint(e.clientX,e.clientY);if(pos===null)return;e.preventDefault();
+ if(pickerOn){const c=chars[Math.min(Math.max(pos,0),chars.length-1)];if(c){typing.fg=c.fg;typing.bg=c.bg;updateChips();status('Sampled text and highlight colors.');}pickerOn=false;$('eyedropper').classList.remove('selected');return;}
+ painting={anchor:pos,last:pos};try{editor.setPointerCapture(e.pointerId);}catch(err){}setSelection(pos,pos);
+});
+editor.addEventListener('pointermove',e=>{if(!painting)return;e.preventDefault();const pos=atPoint(e.clientX,e.clientY);if(pos===null)return;painting.last=pos;setSelection(Math.min(painting.anchor,pos),Math.max(painting.anchor,pos));});
+editor.addEventListener('pointerup',e=>{
+ if(!painting)return;e.preventDefault();let a=Math.min(painting.anchor,painting.last),b=Math.max(painting.anchor,painting.last);if(a===b)b=Math.min(chars.length,b+1);
+ const mode=$('brushType').value;
+ if(mode==='gradient')applyGradient(a,b);else if(mode==='erase')clearRange(a,b);else formatRange(a,b,mode==='highlight'?'bg':'fg',mode==='highlight'?typing.bg:typing.fg);
+ painting=null;try{editor.releasePointerCapture(e.pointerId);}catch(err){}
+});
+editor.addEventListener('pointercancel',()=>{painting=null;});
+// All 256 ANSI samples are retained. Standard and grayscale colors are quantized to the 216 RGB colors available in Krynn's F###/B### notation.
+buildPalette();render();
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+document.querySelectorAll('[data-color-target]').forEach(b=>b.addEventListener('click',()=>openPalette(b.dataset.colorTarget)));
+$('closePalette').addEventListener('click',()=>{$('paletteTray').hidden=true;});
+$('noColor').addEventListener('click',()=>chooseColor(null));
+$('customColor').addEventListener('input',e=>chooseColor(nearest(e.target.value)));
+$('undo').addEventListener('click',undo);$('redo').addEventListener('click',redo);
+$('selectAll').addEventListener('click',()=>{switchTab('edit');setSelection(0,chars.length);editor.focus();});
+$('clearStyle').addEventListener('click',()=>{const {start,end}=selection();if(start<end)clearRange(start,end);else{typing.fg=null;typing.bg=null;updateChips();status('Typing colors cleared.');}});
+$('eyedropper').addEventListener('click',()=>{pickerOn=!pickerOn;brushOn=false;$('paintToggle').classList.remove('selected');$('paintToggle').setAttribute('aria-pressed','false');$('paintToggle').textContent='🖌 Paint off';$('eyedropper').classList.toggle('selected',pickerOn);status(pickerOn?'Click a colored character in the editor.':'Eyedropper off.');});
+$('stops').addEventListener('change',e=>{settings.stopCount=+e.target.value;$('middleButton').hidden=settings.stopCount!==3;});
+$('blend').addEventListener('change',e=>settings.blend=e.target.value);
+$('gradTarget').addEventListener('change',e=>settings.gradTarget=e.target.value);
+$('applyGradient').addEventListener('click',()=>{const {start,end}=selection();if(start===end){status('Select text first, or use Whole text.');return;}applyGradient(start,end);});
+$('gradAll').addEventListener('click',()=>applyGradient(0,chars.length));
+$('paintToggle').addEventListener('click',()=>{brushOn=!brushOn;pickerOn=false;$('eyedropper').classList.remove('selected');editor.classList.toggle('paint-on',brushOn);$('paintToggle').classList.toggle('selected',brushOn);$('paintToggle').setAttribute('aria-pressed',String(brushOn));$('paintToggle').textContent=brushOn?'🖌 Paint on':'🖌 Paint off';status(brushOn?'Drag across characters to paint.':'Paint mode off.');});
+code.addEventListener('input',()=>{putHistory();chars=parseCode(code.value);render();status('Code updated; Editor View is synchronized.');});
+$('copyCode').addEventListener('click',()=>copyText(tab==='code'?code.value:rawCode()));
+$('copyCodeTop').addEventListener('click',()=>copyText(tab==='code'?code.value:rawCode()));
+$('saveCode').addEventListener('click',()=>download('krynn-colored-text.txt',code.value));
+$('saveProject').addEventListener('click',()=>download('krynn-color-editor-project.json',JSON.stringify({format:'krynn-color-editor-v1',chars,settings},null,2),'application/json'));
+$('openFile').addEventListener('click',()=>$('fileInput').click());
+$('fileInput').addEventListener('change',async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{const content=await file.text();putHistory();if(file.name.toLowerCase().endsWith('.json')){
+   const p=JSON.parse(content);if(p.format!=='krynn-color-editor-v1'||!Array.isArray(p.chars))throw new Error('Not a Krynn editor project.');
+   chars=p.chars.filter(c=>typeof c.ch==='string').map(c=>createChar(c.ch,Number.isInteger(c.fg)?c.fg:null,Number.isInteger(c.bg)?c.bg:null));Object.assign(settings,p.settings||{});
+   $('stops').value=String(settings.stopCount||2);$('middleButton').hidden=settings.stopCount!==3;$('blend').value=settings.blend;$('gradTarget').value=settings.gradTarget;
+ }else chars=parseCode(content.replace(/\r\n?/g,'\n'));
+ switchTab('edit');render();status('Opened '+file.name+'.');
+ }catch(err){status('Could not open file: '+err.message);}e.target.value='';
+});
+// Starter document is intentionally blank.
+})();
+</script>
+</body>
+</html>

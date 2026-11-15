@@ -2,6 +2,14 @@
 
 A central directory of tools for Chronicles of Krynn, maintained by [legimia](https://github.com/legimia).
 
+## Use the tools online
+
+Visit the [Chronicles of Krynn tools website](https://legimia.github.io/chronicles-of-krynn/) to launch the Color Text Editor and Crafting Studio in your browser, or download the Mudlet package.
+
+The website is served from `docs/`. To publish it, select **Settings → Pages → Deploy from a branch → main → /docs → Save** in this repository.
+
+The browser apps are hosted copies of the standalone files in their source repositories. Maintainers can refresh them by running `./scripts/sync-tools.ps1`, then committing and pushing the updated files in `docs/`.
+
 ## Find a tool
 
 | Tool | What it does | Get started |
